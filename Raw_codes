@@ -1,0 +1,93 @@
+# Task 1: Create the StudentDatabase class
+class StudentDatabase:
+    # Class attribute named student_list
+    _student_list = []
+
+    # Class method add_student() to insert Student objects
+    @classmethod
+    def add_student(cls, student_obj):
+        cls._student_list.append(student_obj)
+
+
+# Task 2: Create the Student class
+class Student:
+    # Task 3 & 9: Constructor and Data Privacy (__ used for private attributes)
+    def __init__(self, student_id, name, department, is_enrolled=False):
+        self.__student_id = student_id
+        self.__name = name
+        self.__department = department
+        self.__is_enrolled = is_enrolled
+        
+        # Task 3: Automatically insert the Student object into student_list
+        StudentDatabase.add_student(self)
+
+    # Task 4 & 8: Implement enroll_student() with error handling
+    def enroll_student(self):
+        if self.__is_enrolled:
+            raise ValueError(f"Student {self.__student_id} is already enrolled.")
+        self.__is_enrolled = True
+        print(f"Student {self.__student_id} enrolled successfully.")
+
+    # Task 5 & 8: Implement drop_student() with error handling
+    def drop_student(self):
+        if not self.__is_enrolled:
+            raise ValueError(f"Student {self.__student_id} is not currently enrolled.")
+        self.__is_enrolled = False
+        print(f"Student {self.__student_id} dropped successfully.")
+
+    # Task 6: Implement view_student_info() method
+    def view_student_info(self):
+        status = "Enrolled" if self.__is_enrolled else "Not Enrolled"
+        print(f"ID: {self.__student_id} | Name: {self.__name} | Dept: {self.__department} | Status: {status}")
+
+    # Helper method to access private ID for Task 7 & 8
+    def get_id(self):
+        return self.__student_id
+
+
+# --- Manual Initialization (As per Task 3) ---
+s1 = Student("S01", "Alice", "CSE", True)
+s2 = Student("S02", "Bob", "EEE", False)
+
+
+# Task 7: Menu System
+while True:
+    print("\n--- Student Management System ---")
+    print("1. View All Students")
+    print("2. Enroll Student")
+    print("3. Drop Student")
+    print("4. Exit")
+    
+    choice = input("Enter choice: ")
+
+    # Task 7: View All Students
+    if choice == '1':
+        if not StudentDatabase._student_list:
+            print("No students in database.")
+        for s in StudentDatabase._student_list:
+            s.view_student_info()
+
+    # Task 7 & 8: Enroll or Drop Student with ID validation
+    elif choice == '2' or choice == '3':
+        sid = input("Enter Student ID: ")
+        # Task 8: Check for Invalid student ID
+        target = next((s for s in StudentDatabase._student_list if s.get_id() == sid), None)
+        
+        if target:
+            try:
+                if choice == '2':
+                    target.enroll_student()
+                else:
+                    target.drop_student()
+            except ValueError as e:
+                # Task 8: Handling enrollment/drop logic errors
+                print(f"Error: {e}")
+        else:
+            print("Error: Invalid Student ID.")
+
+    # Task 7: Exit option
+    elif choice == '4':
+        print("Exiting...")
+        break
+    else:
+        print("Invalid choice. Try again.")
